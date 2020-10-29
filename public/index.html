@@ -1,28 +1,27 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Socket.IO Chat Example</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Socket.IO Chat Example</title>
+<link rel="stylesheet" href="style.css">
+<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width">
 </head>
 <body>
-  <ul class="pages">
-    <li class="chat page">
-      <div class="chatArea">
-        <ul id="messages"></ul>
-      </div>
-      <input id="inputMessage" class="inputMessage" placeholder="Type here..."/>
-    </li>
-    <li class="login page">
-      <div class="form">
-        <h3 class="title">What's your nickname?</h3>
-        <input id="userNick" type="text" maxlength="14" />
-      </div>
-    </li>
-  </ul>
+	<div class="video-wrap">
+		<div class="chat page">
+			<div class="chatArea">
+				<ul id="messages" class="messages"></ul>
+			</div>
+			
+			<form action="" class="send-message">
+				<input id="inputMessage" class="inputMessage" placeholder="상품에 대해 물어보세요."/>
+				<button>전송</button>
+			</form>
+		</div>
+	</div>
 
-  <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="/main.js"></script>
+	<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/main.js"></script>
 </body>
 </html>

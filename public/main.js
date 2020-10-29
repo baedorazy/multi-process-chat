@@ -1,60 +1,57 @@
 $(function() {
-  var FADE_TIME = 150; // ms
-  var TYPING_TIMER_LENGTH = 400; // ms
-  var COLORS = [
+  let FADE_TIME = 150; // ms
+  let TYPING_TIMER_LENGTH = 400; // ms
+  let COLORS = [
     '#e21400', '#91580f', '#f8a700', '#f78b00',
     '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
     '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
   ];
 
   // Initialize variables
-  var $window = $(window);
-  var $usernameInput = $('.usernameInput'); // Input for username
-  var $messages = $('.messages'); // Messages area
-  var $inputMessage = $('.inputMessage'); // Input message input box
-
-  var $loginPage = $('.login.page'); // The login page
-  var $chatPage = $('.chat.page'); // The chatroom page
+  let $usernameInput = $('.usernameInput'); // Input for username
+  let $messages = $('.messages'); // Messages area
+  let $inputMessage = $('.inputMessage'); // Input message input box
 
   // Prompt for setting a username
-  var username;
-  var connected = false;
-  var typing = false;
-  var lastTypingTime;
+  let username;
+  let connected = false;
+  let typing = false;
+  let lastTypingTime;
   var $currentInput = $usernameInput.focus();
 
   // TODO - Change your url
-  var socket = io('URL', {transports: [ 'websocket' ]});
-
+  let socket = io('127.0.0.1:1986', {transports: [ 'websocket' ]});
+  
   const addParticipantsMessage = (data) => {
-    var message = '';
+    let message = '';
     if (data.numUsers === 1) {
-      message += "there's 1 participant";
+      message += "처음 입장";
     } else {
-      message += "there are " + data.numUsers + " participants";
+      message += data.numUsers + "명 참여 중";
     }
     log(message);
   }
 
-  // Sets the client's username
+	const init = () => {
+		setUsername();
+	};
+	
+	// 닉넴 자동으로 설정 나중에 받아오는 걸로.
   const setUsername = () => {
-    username = cleanInput($usernameInput.val().trim());
-
-    // If the username is valid
-    if (username) {
-      $loginPage.fadeOut();
-      $chatPage.show();
-      $loginPage.off('click');
-      $currentInput = $inputMessage.focus();
-
-      // Tell the server your username
-      socket.emit('add user', username);
-    }
-  }
-
+  	let date = new Date();
+  	if(!!username) {
+			$currentInput = $inputMessage.focus();
+			socket.emit('add user', username);
+		} else{
+			username = 'myNick_'+ date.getHours() +''+ date.getMinutes()+ ''+ date.getSeconds();
+		}
+  };
+	init();
+  
   // Sends a chat message
-  const sendMessage = () => {
-    var message = $inputMessage.val();
+  const sendMessage = (e) => {
+  	e.preventDefault();
+    let message = $inputMessage.val();
     // Prevent markup from being injected into the message
     message = cleanInput(message);
     // if there is a non-empty message and a socket connection
@@ -70,29 +67,29 @@ $(function() {
   }
 
   // Log a message
-    const log = (message, options) => {
-    var $el = $('<li>').addClass('log').text(message);
+	const log = (message, options) => {
+    let $el = $('<li>').addClass('log').text(message);
     addMessageElement($el, options);
   }
 
   // Adds the visual chat message to the message list
   const addChatMessage = (data, options) => {
     // Don't fade the message in if there is an 'X was typing'
-    var $typingMessages = getTypingMessages(data);
+    let $typingMessages = getTypingMessages(data);
     options = options || {};
     if ($typingMessages.length !== 0) {
       options.fade = false;
       $typingMessages.remove();
     }
 
-    var $usernameDiv = $('<span class="username"/>')
+    let $usernameDiv = $('<span class="username"/>')
       .text(data.username)
       .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
+    let $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
 
-    var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="message"/>')
+    let typingClass = data.typing ? 'typing' : '';
+    let $messageDiv = $('<li class="message"/>')
       .data('username', data.username)
       .addClass(typingClass)
       .append($usernameDiv, $messageBodyDiv);
@@ -120,7 +117,7 @@ $(function() {
   // options.prepend - If the element should prepend
   //   all other messages (default = false)
   const addMessageElement = (el, options) => {
-    var $el = $(el);
+    let $el = $(el);
 
     // Setup default options
     if (!options) {
@@ -160,8 +157,8 @@ $(function() {
       lastTypingTime = (new Date()).getTime();
 
       setTimeout(() => {
-        var typingTimer = (new Date()).getTime();
-        var timeDiff = typingTimer - lastTypingTime;
+        let typingTimer = (new Date()).getTime();
+        let timeDiff = typingTimer - lastTypingTime;
         if (timeDiff >= TYPING_TIMER_LENGTH && typing) {
           socket.emit('stop typing');
           typing = false;
@@ -180,18 +177,17 @@ $(function() {
   // Gets the color of a username through our hash function
   const getUsernameColor = (username) => {
     // Compute hash code
-    var hash = 7;
-    for (var i = 0; i < username.length; i++) {
+    let hash = 7;
+    for (let i = 0; i < username.length; i++) {
        hash = username.charCodeAt(i) + (hash << 5) - hash;
     }
     // Calculate color
-    var index = Math.abs(hash % COLORS.length);
+    let index = Math.abs(hash % COLORS.length);
     return COLORS[index];
   }
 
   // Keyboard events
-
-  $window.keydown(event => {
+	document.addEventListener('keydown', function (event) {
     // Auto-focus the current input when a key is typed
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
       $currentInput.focus();
@@ -206,14 +202,13 @@ $(function() {
         setUsername();
       }
     }
-  });
+  }, false);
 
   $inputMessage.on('input', () => {
     updateTyping();
   });
 
-  // Click events
-
+  // # ============= Click events
   // Focus input when clicking anywhere on login page
   $loginPage.click(() => {
     $currentInput.focus();
@@ -230,7 +225,7 @@ $(function() {
   socket.on('login', (data) => {
     connected = true;
     // Display the welcome message
-    var message = "Welcome to Socket.IO Chat – ";
+    let message = "Welcome to Socket.IO Chat – ";
     log(message, {
       prepend: true
     });
@@ -276,8 +271,8 @@ $(function() {
     }
   });
 
-  socket.on('reconnect_error', () => {
-    log('attempt to reconnect has failed');
+  socket.on('reconnect_error', (err) => {
+    log('attempt to reconnect has failed', err);
   });
 
 });
