@@ -3,7 +3,7 @@
     "version": "0.0.0",
     "description": "A simple multi process chat client using socket.io & redis",
     "main": "index.js",
-    "author": "DOZAKA",
+    "author": "service part",
     "private": true,
     "license": "BSD",
     "dependencies": {
