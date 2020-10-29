@@ -49,8 +49,7 @@ $(function() {
 	init();
   
   // Sends a chat message
-  const sendMessage = (e) => {
-  	e.preventDefault();
+  const sendMessage = () => {
     let message = $inputMessage.val();
     // Prevent markup from being injected into the message
     message = cleanInput(message);
